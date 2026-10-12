@@ -30,7 +30,7 @@ public class FileController {
 
     public void download(Context ctx) throws Exception {
          try {
-             FileDownloadRequest request = ctx.bodyValidator(FileDownloadRequest.class)
+             FileRequest request = ctx.bodyValidator(FileRequest.class)
                      .check(dto -> dto.filename() != null && !dto.filename().isBlank(), "filename cannot be empty")
                      .check(dto -> dto.filename().length() <= 50, "Filename is too long (max filename length 50 characters)")
                      .get();
@@ -48,5 +48,19 @@ public class FileController {
              ctx.status(HttpStatus.NOT_FOUND);
              ctx.result(e.getMessage());
          }
+    }
+
+    public void delete(Context ctx) throws Exception {
+        try {
+            FileRequest request = ctx.bodyValidator(FileRequest.class)
+                    .check(dto -> dto.filename() != null && !dto.filename().isBlank(), "filename cannot be empty")
+                    .get();
+
+            fileService.delete(request.filename());
+            ctx.status(200);
+        } catch (NotFoundError e) {
+            ctx.status(HttpStatus.NOT_FOUND);
+            ctx.result(e.getMessage());
+        }
     }
 }

@@ -39,4 +39,15 @@ public class LocalFileRepository implements FileRepository {
         }
         return filePath;
     }
+
+    @Override
+    public void delete(String filename) throws NotFoundError {
+        Path filePath = Path.of("storage-data").resolve(filename);
+
+        if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+            throw new NotFoundError("File not found");
+        }
+
+       filePath.toFile().delete();
+    }
 }

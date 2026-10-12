@@ -1,5 +1,5 @@
 package org.gluechat.storage.file;
 
-public record FileDownloadRequest(
+public record FileRequest(
      String filename
 ) {}

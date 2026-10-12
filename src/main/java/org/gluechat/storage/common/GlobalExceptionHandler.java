@@ -10,16 +10,6 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    private static boolean isCausedBySizeLimitExceeded(Throwable throwable) {
-        Throwable current = throwable;
-        while (current != null) {
-            if (current.getMessage() != null && current.getMessage().toLowerCase().contains("exceed")) {
-                return true;
-            }
-            current = current.getCause();
-        }
-        return false;
-    }
 
 
     public static void register(RoutesConfig routes) {
@@ -28,14 +18,7 @@ public class GlobalExceptionHandler {
         });
 
 
-
         routes.exception(Exception.class, (e, ctx) -> {
-
-            if (isCausedBySizeLimitExceeded(e)) {
-                ctx.status(413);
-                ctx.result("Reached size limit (50mb)");
-                return;
-            }
 
             logger.error("Unhandled exception during request processing", e);
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR)

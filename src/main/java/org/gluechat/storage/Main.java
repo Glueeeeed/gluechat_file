@@ -27,7 +27,6 @@ void main() throws IOException {
 
 
     Javalin app = Javalin.create(config -> {
-        config.jetty.multipartConfig.maxFileSize(50, SizeUnit.MB);
 
         config.bundledPlugins.enableCors(cors -> {
             cors.addRule(it -> {
@@ -54,6 +53,7 @@ void main() throws IOException {
                 path("files", () -> {
                     post(controller::upload);
                     post("/download", controller::download);
+                    delete("/delete", controller::delete);
                 });
             });
         });

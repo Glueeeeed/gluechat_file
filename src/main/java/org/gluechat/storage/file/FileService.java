@@ -28,4 +28,8 @@ public class FileService {
     public Path download(String filename) throws NotFoundError, IOException {
         return repository.download(filename);
     }
+
+    public void delete(String filename) throws NotFoundError, IOException {
+        repository.delete(filename);
+    }
 }
