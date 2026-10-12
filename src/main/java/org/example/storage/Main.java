@@ -1,3 +1,4 @@
+import io.github.cdimascio.dotenv.Dotenv;
 import io.javalin.Javalin;
 import io.javalin.config.SizeUnit;
 import org.example.storage.common.GlobalExceptionHandler;
@@ -10,6 +11,11 @@ import static io.javalin.apibuilder.ApiBuilder.*;
 
 
 void main() throws IOException {
+    Dotenv dotenv = Dotenv.load();
+
+    String apiKey = dotenv.get("API_KEY");
+    int port = Integer.parseInt(dotenv.get("PORT", "7070"));
+
     FileRepository repository = new LocalFileRepository(Path.of("storage-data"));
 
     FileService service = new FileService(repository);
@@ -18,7 +24,28 @@ void main() throws IOException {
 
     Javalin app = Javalin.create(config -> {
         config.jetty.multipartConfig.maxFileSize(50, SizeUnit.MB);
+
+        config.bundledPlugins.enableCors(cors -> {
+            cors.addRule(it -> {
+                it.anyHost();
+            });
+        });
         config.routes.apiBuilder(() -> {
+
+            before("/api/*", ctx -> {
+                if (ctx.method().name().equalsIgnoreCase("OPTIONS")) {
+                    return;
+                }
+                String clientApiKey = ctx.header("X-API-Key");
+
+                if (clientApiKey == null || !clientApiKey.equals(apiKey)) {
+                    ctx.status(401);
+                    ctx.result("Unauthorized: Invalid or missing api key");
+                    ctx.skipRemainingHandlers();
+                }
+            });
+
+
             path("api", () -> {
                 path("files", () -> {
                     post(controller::upload);
@@ -29,7 +56,7 @@ void main() throws IOException {
         GlobalExceptionHandler.register(config.routes);
     });
 
-    app.start(7070);
+    app.start(port);
 
-    System.out.println("GlueChat Storage Api started");
+    System.out.println("GlueChat Storage Api started. App Port: " + port);
 }

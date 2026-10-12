@@ -40,3 +40,5 @@ build/
 
 ### Test file ###
 /index.html
+/storage-data/
+/.env
