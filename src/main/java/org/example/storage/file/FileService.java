@@ -8,7 +8,7 @@ public class FileService {
     public FileService(FileRepository repository) {
         this.repository = repository;
     }
-    public FileMetadata upload(InputStream content, String originalFilename, String extension, long size) throws IOException {
+    public FileMetadata upload(InputStream content, String originalFilename, String extension) throws IOException {
         String id = UUID.randomUUID().toString();
 
         String ext = (extension != null && !extension.isBlank())
@@ -17,6 +17,6 @@ public class FileService {
 
         String storedFileName = id + ext;
         repository.save(storedFileName, content);
-        return new FileMetadata(id, originalFilename, ext, size);
+        return new FileMetadata(id, originalFilename, ext);
     }
 }

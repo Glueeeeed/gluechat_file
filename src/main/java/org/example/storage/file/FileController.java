@@ -19,8 +19,7 @@ public class FileController {
         FileMetadata metadata = fileService.upload(
                 uploadedFile.content(),
                 uploadedFile.filename(),
-                uploadedFile.extension(),
-                uploadedFile.size()
+                uploadedFile.extension()
         );
         ctx.status(HttpStatus.CREATED).json(metadata);
     }
