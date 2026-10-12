@@ -1,4 +1,6 @@
-package org.example.storage.file;
+package org.gluechat.storage.file;
+
+import org.gluechat.storage.common.NotFoundError;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,5 +28,15 @@ public class LocalFileRepository implements FileRepository {
         }
 
         Files.copy(content, destination, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    @Override
+    public Path download(String filename) throws NotFoundError {
+        Path filePath = Path.of("storage-data").resolve(filename);
+
+        if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+            throw new NotFoundError("File not found");
+        }
+        return filePath;
     }
 }

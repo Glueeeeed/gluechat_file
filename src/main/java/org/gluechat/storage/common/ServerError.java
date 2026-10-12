@@ -1,4 +1,4 @@
-package org.example.storage.common;
+package org.gluechat.storage.common;
 
 public record ServerError(
       String message

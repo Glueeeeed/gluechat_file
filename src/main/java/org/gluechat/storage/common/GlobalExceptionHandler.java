@@ -1,4 +1,4 @@
-package org.example.storage.common;
+package org.gluechat.storage.common;
 
 import io.javalin.config.RoutesConfig;
 import io.javalin.http.HttpResponseException;

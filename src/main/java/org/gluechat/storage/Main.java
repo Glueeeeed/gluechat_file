@@ -1,8 +1,12 @@
 import io.github.cdimascio.dotenv.Dotenv;
 import io.javalin.Javalin;
 import io.javalin.config.SizeUnit;
-import org.example.storage.common.GlobalExceptionHandler;
-import org.example.storage.file.*;
+import org.gluechat.storage.common.GlobalExceptionHandler;
+import org.gluechat.storage.file.*;
+import org.gluechat.storage.file.FileController;
+import org.gluechat.storage.file.FileRepository;
+import org.gluechat.storage.file.FileService;
+import org.gluechat.storage.file.LocalFileRepository;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -49,6 +53,7 @@ void main() throws IOException {
             path("api", () -> {
                 path("files", () -> {
                     post(controller::upload);
+                    post("/download", controller::download);
                 });
             });
         });
