@@ -11,20 +11,21 @@ import org.gluechat.storage.file.LocalFileRepository;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.SecureRandom;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        SecureRandom secureRandom = new SecureRandom();
         Dotenv dotenv = Dotenv.load();
 
         String apiKey = dotenv.get("API_KEY");
         int port = Integer.parseInt(dotenv.get("PORT", "7070"));
 
         FileRepository repository = new LocalFileRepository(Path.of("storage-data"));
-
-        FileService service = new FileService(repository);
+        FileService service = new FileService(repository,secureRandom);
         FileController controller = new FileController(service);
 
 
@@ -37,7 +38,7 @@ public class Main {
             });
             config.routes.apiBuilder(() -> {
 
-                before("/api/*", ctx -> {
+                before("/storage/files/*", ctx -> {
                     if (ctx.method().name().equalsIgnoreCase("OPTIONS")) {
                         return;
                     }
@@ -51,13 +52,13 @@ public class Main {
                 });
 
 
-                path("api", () -> {
-                    get(ctx -> ctx.result("GlueChat File Server"));
-                    path("files", () -> {
-                        post(controller::upload);
+                path("storage", () -> {
+                        get(ctx -> ctx.result("GlueChat File Server"));
                         post("/download", controller::download);
-                        delete("/delete", controller::delete);
-                    });
+                        path("files", () -> {
+                            post(controller::upload);
+                            delete("/delete", controller::delete);
+                        });
                 });
             });
 

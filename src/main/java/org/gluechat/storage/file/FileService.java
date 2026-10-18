@@ -4,25 +4,27 @@ import org.gluechat.storage.common.NotFoundError;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.UUID;
+import java.util.HexFormat;
+import java.security.SecureRandom;
 
-public class FileService {
+public class FileService { ;
     private final FileRepository repository;
+    private final SecureRandom secureRandom;
 
-    public FileService(FileRepository repository) {
+    public FileService(FileRepository repository, SecureRandom secureRandom) {
         this.repository = repository;
+        this.secureRandom = secureRandom;
     }
 
-    public FileMetadataResponse upload(InputStream content, String extension) throws IOException {
-        String id = UUID.randomUUID().toString();
+    public FileMetadataResponse upload(InputStream content, String extension, String originalFileName) throws IOException {
+        byte[] randomBytes = new byte[16];
+        secureRandom.nextBytes(randomBytes);
+        String hexRandomBytes = HexFormat.of().formatHex(randomBytes);
 
-        String ext = (extension != null && !extension.isBlank())
-                ? (extension.startsWith(".") ? extension : "." + extension)
-                : "";
 
-        String storedFileName = id + ext;
-        repository.save(storedFileName, content);
-        return new FileMetadataResponse(storedFileName);
+        String filename =  originalFileName + "|" + hexRandomBytes;
+        repository.save(filename, content);
+        return new FileMetadataResponse(filename);
     }
 
     public Path download(String filename) throws NotFoundError, IOException {
