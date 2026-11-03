@@ -30,25 +30,25 @@ public class FileController {
     }
 
     public void download(Context ctx) throws Exception {
-         try {
-             FileRequest request = ctx.bodyValidator(FileRequest.class)
-                     .check(dto -> dto.filename() != null && !dto.filename().isBlank(), "filename cannot be empty")
-                     .check(dto -> dto.filename().length() <= 50, "Filename is too long (max filename length 50 characters)")
-                     .get();
+        try {
+            FileRequest request = ctx.bodyValidator(FileRequest.class)
+                    .check(dto -> dto.filename() != null && !dto.filename().isBlank(), "filename cannot be empty")
+                    .check(dto -> dto.filename().length() <= 50, "Filename is too long (max filename length 50 characters)")
+                    .get();
 
-             Path filePath = fileService.download(request.filename());
+            Path filePath = fileService.download(request.filename());
 
+            // Read file bytes and encode to base64 to prevent binary corruption during transfer
+            byte[] fileBytes = Files.readAllBytes(filePath);
+            String base64File = java.util.Base64.getEncoder().encodeToString(fileBytes);
 
-             ctx.header("Content-Disposition", "attachment; filename=\"" + request.filename() + "\"");
+            ctx.contentType("application/json");
+            ctx.result("{\"file\":\"" + base64File + "\",\"filename\":\"" + request.filename() + "\"}");
 
-             ctx.contentType("application/octet-stream");
-
-             ctx.result(Files.newInputStream(filePath));
-
-         } catch (NotFoundError e) {
-             ctx.status(HttpStatus.NOT_FOUND);
-             ctx.result(e.getMessage());
-         }
+        } catch (NotFoundError e) {
+            ctx.status(HttpStatus.NOT_FOUND);
+            ctx.result(e.getMessage());
+        }
     }
 
     public void delete(Context ctx) throws Exception {
