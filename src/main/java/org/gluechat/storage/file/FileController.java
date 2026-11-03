@@ -33,7 +33,7 @@ public class FileController {
         try {
             FileRequest request = ctx.bodyValidator(FileRequest.class)
                     .check(dto -> dto.filename() != null && !dto.filename().isBlank(), "filename cannot be empty")
-                    .check(dto -> dto.filename().length() <= 50, "Filename is too long (max filename length 50 characters)")
+                    .check(dto -> dto.filename().length() <= 150, "Filename is too long (max filename length 50 characters)")
                     .get();
 
             Path filePath = fileService.download(request.filename());
