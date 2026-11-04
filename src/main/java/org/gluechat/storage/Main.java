@@ -3,6 +3,7 @@ package org.gluechat.storage;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.javalin.Javalin;
 import org.gluechat.storage.common.GlobalExceptionHandler;
+import org.gluechat.storage.common.Jwt;
 import org.gluechat.storage.file.*;
 import org.gluechat.storage.file.FileController;
 import org.gluechat.storage.file.FileRepository;
@@ -20,8 +21,8 @@ public class Main {
     public static void main(String[] args) throws IOException {
         SecureRandom secureRandom = new SecureRandom();
         Dotenv dotenv = Dotenv.load();
+        Jwt jwt = new Jwt(dotenv);
 
-        String apiKey = dotenv.get("API_KEY");
         int port = Integer.parseInt(dotenv.get("PORT", "7070"));
 
         FileRepository repository = new LocalFileRepository(Path.of("storage-data"));
@@ -38,13 +39,13 @@ public class Main {
             });
             config.routes.apiBuilder(() -> {
 
-                before("/storage/files/*", ctx -> {
+                before("/storage/*", ctx -> {
                     if (ctx.method().name().equalsIgnoreCase("OPTIONS")) {
                         return;
                     }
                     String clientApiKey = ctx.header("X-API-Key");
 
-                    if (clientApiKey == null || !clientApiKey.equals(apiKey)) {
+                    if (clientApiKey == null || !jwt.verifyToken(clientApiKey)) {
                         ctx.status(401);
                         ctx.result("Unauthorized: Invalid or missing api key");
                         ctx.skipRemainingHandlers();
