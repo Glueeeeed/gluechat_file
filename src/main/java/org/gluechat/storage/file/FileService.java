@@ -21,10 +21,19 @@ public class FileService { ;
         secureRandom.nextBytes(randomBytes);
         String hexRandomBytes = HexFormat.of().formatHex(randomBytes);
 
+        String normalizedFileName = normalizeFileName(originalFileName);
 
-        String filename =  originalFileName + "|" + hexRandomBytes;
+        String filename =  normalizedFileName + "|" + hexRandomBytes;
         repository.save(filename, content);
         return new FileMetadataResponse(filename);
+    }
+
+    private String normalizeFileName(String fileName) {
+        String normalized = fileName.replace('|', '_').replace(' ', '_');
+        if (normalized.length() > 25) {
+            normalized = normalized.substring(0, 25);
+        }
+        return normalized;
     }
 
     public Path download(String filename) throws NotFoundError, IOException {
