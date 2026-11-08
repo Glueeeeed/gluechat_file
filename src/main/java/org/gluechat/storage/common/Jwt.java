@@ -33,7 +33,7 @@ public class Jwt {
 
         } catch (ExpiredJwtException | SignatureException e) {
             return false;
-        } catch (JwtException e) {
+        } catch(JwtException e) {
             return false;
         } catch (Exception e) {
             System.err.println("Failed to verify token: " + e.getMessage());

@@ -19,11 +19,6 @@ public class FileController {
                 .get();
 
         byte[] fileBytes = Base64.getDecoder().decode(request.file64());
-        if (fileBytes.length > 50L * 1024 * 1024) {
-            ctx.status(413);
-            ctx.result("File too large");
-            return;
-        }
 
         String extension = "";
         int dotIndex = request.fileName().lastIndexOf('.');

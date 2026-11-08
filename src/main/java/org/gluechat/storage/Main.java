@@ -32,6 +32,7 @@ public class Main {
 
         Javalin app = Javalin.create(config -> {
 
+            config.http.maxRequestSize = 100L * 1024 * 1024;
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(it -> {
                     it.anyHost();
